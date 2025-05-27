@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Sistema RGS - Panel de Administración" />
+    <meta name="theme-color" content="#1976d2" />
+    <title>RGS Backoffice</title>
+
+    <!-- Fuentes -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+
+    <!-- Estilos base -->
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        #root {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .loading-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.8);
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        .loading-container.active {
+            pointer-events: auto;
+        }
+
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        .notification-container>* {
+            pointer-events: auto;
+        }
+
+        .modal-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 9998;
+            pointer-events: none;
+        }
+
+        .modal-container.active {
+            pointer-events: auto;
+        }
+
+        /* Asegurar que todos los elementos sean clickeables por defecto */
+        * {
+            pointer-events: auto;
+        }
+
+        /* Asegurar que los botones y inputs sean clickeables */
+        button,
+        input,
+        textarea,
+        select,
+        a {
+            pointer-events: auto !important;
+            cursor: pointer;
+        }
+
+        input,
+        textarea {
+            cursor: text;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Contenedor principal de la aplicación -->
+    <div id="root">
+        <!-- El contenido de la aplicación se montará aquí -->
+    </div>
+
+    <!-- Contenedor para notificaciones -->
+    <div id="notification-container" class="notification-container"></div>
+
+    <!-- Contenedor para modales -->
+    <div id="modal-container" class="modal-container"></div>
+
+    <!-- Contenedor para loading global -->
+    <div id="loading-container" class="loading-container" style="display: none;">
+        <div class="loading-spinner">
+            <!-- El spinner se montará aquí -->
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="/src/main.tsx"></script>
+</body>
+
+</html>
