@@ -13,6 +13,24 @@ import {
     LoginResponse
 } from '../types/api';
 
+// Configuración de usuarios para desarrollo
+// IMPORTANTE: En producción, esto debe venir de variables de entorno o API segura
+const DEVELOPMENT_USERS = [
+    {
+        username: import.meta.env.VITE_ADMIN_USER || 'admin',
+        password: import.meta.env.VITE_ADMIN_PASS || 'admin123',
+        userData: {
+            id: '1',
+            username: 'admin',
+            email: 'admin@example.com',
+            role: 'admin',
+            status: 'active',
+            createdAt: '2024-01-01T00:00:00Z',
+            updatedAt: '2024-01-01T00:00:00Z'
+        }
+    }
+];
+
 // Datos mock
 const mockUsers: User[] = [
     {
@@ -196,20 +214,29 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 // Mock API functions
 export const mockApi = {
-    // Auth
+    // Auth - Versión más segura
     login: async (credentials: { username: string; password: string }) => {
         await delay(1000);
-        if (credentials.username === 'admin' && credentials.password === 'admin123') {
+
+        // Buscar usuario válido
+        const validUser = DEVELOPMENT_USERS.find(
+            user => user.username === credentials.username && user.password === credentials.password
+        );
+
+        if (validUser) {
             const response: ApiResponse<LoginResponse> = {
                 data: {
-                    token: 'mock_jwt_token_123456789',
-                    user: mockUsers[0]
+                    token: `mock_jwt_token_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                    user: validUser.userData
                 },
                 status: 200,
                 message: 'Login successful'
             };
             return { data: response };
         }
+
+        // Simular delay incluso para credenciales incorrectas (seguridad)
+        await delay(500);
         throw new Error('Credenciales inválidas');
     },
 

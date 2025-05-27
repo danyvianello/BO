@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
-import Login from './pages/LoginTest';
+import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Users from './pages/users/Users';
 import CreateUser from './pages/users/CreateUser';
@@ -19,6 +19,7 @@ import Reports from './pages/reports/Reports';
 import Transactions from './pages/transactions/Transactions';
 import TestPage from './pages/TestPage';
 import { useAuthStore } from './stores/authStore';
+import { showSecurityWarnings } from './config/security';
 
 const theme = createTheme({
     palette: {
@@ -68,6 +69,11 @@ const queryClient = new QueryClient({
 
 const App: React.FC = () => {
     const { isAuthenticated } = useAuthStore();
+
+    // Mostrar advertencias de seguridad en desarrollo
+    useEffect(() => {
+        showSecurityWarnings();
+    }, []);
 
     return (
         <QueryClientProvider client={queryClient}>
