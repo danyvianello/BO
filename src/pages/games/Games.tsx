@@ -31,18 +31,23 @@ import {
 } from '@mui/icons-material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm, Controller } from 'react-hook-form';
-import { getGames, createGame, updateGame, deleteGame } from '../../services';
+import { getGames, createGame, updateGame, deleteGame } from '../../services/api';
 import { Game } from '../../types/api';
 import { useUIStore } from '../../stores/uiStore';
+import { formatDate } from '../../utils/formatters';
 
 interface GameFormData {
     name: string;
-    code: string;
     provider: string;
     type: string;
     status: 'active' | 'inactive';
-    minBet: number;
-    maxBet: number;
+    description?: string;
+    thumbnail_url?: string;
+    rtp?: number;
+    min_bet?: number;
+    max_bet?: number;
+    currency?: string;
+    is_active?: boolean;
 }
 
 const Games: React.FC = () => {
@@ -57,12 +62,16 @@ const Games: React.FC = () => {
     const { control, handleSubmit, reset, formState: { errors } } = useForm<GameFormData>({
         defaultValues: {
             name: '',
-            code: '',
             provider: '',
             type: 'slot',
             status: 'active',
-            minBet: 0.01,
-            maxBet: 1000,
+            description: '',
+            thumbnail_url: '',
+            rtp: 0.90,
+            min_bet: 0.01,
+            max_bet: 1000,
+            currency: 'USD',
+            is_active: true
         },
     });
 
@@ -78,8 +87,8 @@ const Games: React.FC = () => {
             addNotification('Juego creado exitosamente', 'success');
             handleCloseDialog();
         },
-        onError: () => {
-            addNotification('Error al crear el juego', 'error');
+        onError: (error: any) => {
+            addNotification(error.message || 'Error al crear el juego', 'error');
         },
     });
 
@@ -91,8 +100,8 @@ const Games: React.FC = () => {
             addNotification('Juego actualizado exitosamente', 'success');
             handleCloseDialog();
         },
-        onError: () => {
-            addNotification('Error al actualizar el juego', 'error');
+        onError: (error: any) => {
+            addNotification(error.message || 'Error al actualizar el juego', 'error');
         },
     });
 
@@ -104,8 +113,8 @@ const Games: React.FC = () => {
             setDeleteConfirmOpen(false);
             setGameToDelete(null);
         },
-        onError: () => {
-            addNotification('Error al eliminar el juego', 'error');
+        onError: (error: any) => {
+            addNotification(error.message || 'Error al eliminar el juego', 'error');
         },
     });
 
@@ -114,23 +123,31 @@ const Games: React.FC = () => {
             setEditingGame(game);
             reset({
                 name: game.name,
-                code: game.code,
                 provider: game.provider,
                 type: game.type,
                 status: game.status,
-                minBet: game.minBet,
-                maxBet: game.maxBet,
+                description: game.description,
+                thumbnail_url: game.thumbnail_url,
+                rtp: game.rtp,
+                min_bet: game.min_bet,
+                max_bet: game.max_bet,
+                currency: game.currency,
+                is_active: game.is_active
             });
         } else {
             setEditingGame(null);
             reset({
                 name: '',
-                code: '',
                 provider: '',
                 type: 'slot',
                 status: 'active',
-                minBet: 0.01,
-                maxBet: 1000,
+                description: '',
+                thumbnail_url: '',
+                rtp: 0.90,
+                min_bet: 0.01,
+                max_bet: 1000,
+                currency: 'USD',
+                is_active: true
             });
         }
         setOpenDialog(true);
@@ -144,7 +161,7 @@ const Games: React.FC = () => {
 
     const handleSubmitForm = (data: GameFormData) => {
         if (editingGame) {
-            updateMutation.mutate({ id: editingGame.id, data });
+            updateMutation.mutate({ id: editingGame._id || editingGame.id, data });
         } else {
             createMutation.mutate(data);
         }
@@ -157,13 +174,12 @@ const Games: React.FC = () => {
 
     const handleConfirmDelete = () => {
         if (gameToDelete) {
-            deleteMutation.mutate(gameToDelete.id);
+            deleteMutation.mutate(gameToDelete._id);
         }
     };
 
     const columns: GridColDef[] = [
         { field: 'name', headerName: 'Nombre', width: 200 },
-        { field: 'code', headerName: 'Código', width: 150 },
         { field: 'provider', headerName: 'Proveedor', width: 150 },
         { field: 'type', headerName: 'Tipo', width: 120 },
         {
@@ -178,8 +194,14 @@ const Games: React.FC = () => {
                 />
             ),
         },
-        { field: 'minBet', headerName: 'Apuesta Mín.', width: 120 },
-        { field: 'maxBet', headerName: 'Apuesta Máx.', width: 120 },
+        { field: 'min_bet', headerName: 'Apuesta Mín.', width: 120 },
+        { field: 'max_bet', headerName: 'Apuesta Máx.', width: 120 },
+        {
+            field: 'created_at',
+            headerName: 'Fecha de Creación',
+            width: 180,
+            valueGetter: (params) => formatDate(params.row.created_at || params.row.createdAt),
+        },
         {
             field: 'actions',
             type: 'actions',
@@ -200,49 +222,46 @@ const Games: React.FC = () => {
         },
     ];
 
-    const games = gamesResponse?.data?.data?.data || [];
-
     return (
-        <Box>
-            <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-                <Typography variant="h4" component="h1">
-                    Gestión de Juegos
-                </Typography>
-                <Button
-                    variant="contained"
-                    startIcon={<AddIcon />}
-                    onClick={() => handleOpenDialog()}
-                >
-                    Nuevo Juego
-                </Button>
-            </Box>
-
+        <Box sx={{ p: 3 }}>
             <Card>
                 <CardContent>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                        <Typography variant="h5" component="h2">
+                            Juegos
+                        </Typography>
+                        <Button
+                            variant="contained"
+                            startIcon={<AddIcon />}
+                            onClick={() => handleOpenDialog()}
+                        >
+                            Crear Juego
+                        </Button>
+                    </Box>
                     <DataGrid
-                        rows={games}
+                        rows={gamesResponse?.data?.data?.data || []}
                         columns={columns}
                         loading={isLoading}
                         autoHeight
-                        disableRowSelectionOnClick
+                        pageSizeOptions={[10, 25, 50]}
                         initialState={{
                             pagination: {
-                                paginationModel: { page: 0, pageSize: 10 },
+                                paginationModel: { pageSize: 10 },
                             },
                         }}
-                        pageSizeOptions={[5, 10, 25]}
+                        getRowId={(row) => row._id || row.id}
+                        disableRowSelectionOnClick
                     />
                 </CardContent>
             </Card>
 
-            {/* Dialog para crear/editar juego */}
             <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
                 <DialogTitle>
                     {editingGame ? 'Editar Juego' : 'Nuevo Juego'}
                 </DialogTitle>
                 <form onSubmit={handleSubmit(handleSubmitForm)}>
                     <DialogContent>
-                        <Box display="flex" flexDirection="column" gap={2}>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                             <Controller
                                 name="name"
                                 control={control}
@@ -253,21 +272,6 @@ const Games: React.FC = () => {
                                         label="Nombre"
                                         error={!!errors.name}
                                         helperText={errors.name?.message}
-                                        fullWidth
-                                    />
-                                )}
-                            />
-                            <Controller
-                                name="code"
-                                control={control}
-                                rules={{ required: 'El código es requerido' }}
-                                render={({ field }) => (
-                                    <TextField
-                                        {...field}
-                                        label="Código"
-                                        error={!!errors.code}
-                                        helperText={errors.code?.message}
-                                        fullWidth
                                     />
                                 )}
                             />
@@ -281,73 +285,110 @@ const Games: React.FC = () => {
                                         label="Proveedor"
                                         error={!!errors.provider}
                                         helperText={errors.provider?.message}
-                                        fullWidth
                                     />
                                 )}
                             />
                             <Controller
                                 name="type"
                                 control={control}
+                                rules={{ required: 'El tipo es requerido' }}
                                 render={({ field }) => (
-                                    <FormControl fullWidth>
-                                        <InputLabel>Tipo</InputLabel>
-                                        <Select {...field} label="Tipo">
-                                            <MenuItem value="slot">Slot</MenuItem>
-                                            <MenuItem value="table">Mesa</MenuItem>
-                                            <MenuItem value="live">En Vivo</MenuItem>
-                                            <MenuItem value="lottery">Lotería</MenuItem>
-                                        </Select>
-                                    </FormControl>
+                                    <TextField
+                                        {...field}
+                                        select
+                                        label="Tipo"
+                                        error={!!errors.type}
+                                        helperText={errors.type?.message}
+                                    >
+                                        <MenuItem value="slot">Slot</MenuItem>
+                                        <MenuItem value="table">Mesa</MenuItem>
+                                        <MenuItem value="live">Live</MenuItem>
+                                        <MenuItem value="lottery">Lotería/Raspadita</MenuItem>
+                                    </TextField>
                                 )}
                             />
                             <Controller
                                 name="status"
                                 control={control}
+                                rules={{ required: 'El estado es requerido' }}
                                 render={({ field }) => (
-                                    <FormControl fullWidth>
-                                        <InputLabel>Estado</InputLabel>
-                                        <Select {...field} label="Estado">
-                                            <MenuItem value="active">Activo</MenuItem>
-                                            <MenuItem value="inactive">Inactivo</MenuItem>
-                                        </Select>
-                                    </FormControl>
+                                    <TextField
+                                        {...field}
+                                        select
+                                        label="Estado"
+                                        error={!!errors.status}
+                                        helperText={errors.status?.message}
+                                    >
+                                        <MenuItem value="active">Activo</MenuItem>
+                                        <MenuItem value="inactive">Inactivo</MenuItem>
+                                    </TextField>
                                 )}
                             />
                             <Controller
-                                name="minBet"
+                                name="description"
                                 control={control}
-                                rules={{
-                                    required: 'La apuesta mínima es requerida',
-                                    min: { value: 0.01, message: 'Debe ser mayor a 0' }
-                                }}
+                                render={({ field }) => (
+                                    <TextField
+                                        {...field}
+                                        label="Descripción"
+                                        multiline
+                                        rows={3}
+                                    />
+                                )}
+                            />
+                            <Controller
+                                name="thumbnail_url"
+                                control={control}
+                                render={({ field }) => (
+                                    <TextField
+                                        {...field}
+                                        label="URL de la imagen"
+                                    />
+                                )}
+                            />
+                            <Controller
+                                name="rtp"
+                                control={control}
+                                render={({ field }) => (
+                                    <TextField
+                                        {...field}
+                                        label="RTP"
+                                        type="number"
+                                        inputProps={{ step: 0.01, min: 0, max: 1 }}
+                                    />
+                                )}
+                            />
+                            <Controller
+                                name="min_bet"
+                                control={control}
                                 render={({ field }) => (
                                     <TextField
                                         {...field}
                                         label="Apuesta Mínima"
                                         type="number"
-                                        error={!!errors.minBet}
-                                        helperText={errors.minBet?.message}
-                                        fullWidth
-                                        inputProps={{ step: 0.01 }}
+                                        inputProps={{ step: 0.01, min: 0 }}
                                     />
                                 )}
                             />
                             <Controller
-                                name="maxBet"
+                                name="max_bet"
                                 control={control}
-                                rules={{
-                                    required: 'La apuesta máxima es requerida',
-                                    min: { value: 0.01, message: 'Debe ser mayor a 0' }
-                                }}
                                 render={({ field }) => (
                                     <TextField
                                         {...field}
                                         label="Apuesta Máxima"
                                         type="number"
-                                        error={!!errors.maxBet}
-                                        helperText={errors.maxBet?.message}
-                                        fullWidth
-                                        inputProps={{ step: 0.01 }}
+                                        inputProps={{ step: 0.01, min: 0 }}
+                                    />
+                                )}
+                            />
+                            <Controller
+                                name="currency"
+                                control={control}
+                                render={({ field }) => (
+                                    <TextField
+                                        {...field}
+                                        label="Moneda"
                                     />
                                 )}
                             />
@@ -355,19 +396,17 @@ const Games: React.FC = () => {
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={handleCloseDialog}>Cancelar</Button>
-                        <Button
-                            type="submit"
-                            variant="contained"
-                            disabled={createMutation.isPending || updateMutation.isPending}
-                        >
+                        <Button type="submit" variant="contained">
                             {editingGame ? 'Actualizar' : 'Crear'}
                         </Button>
                     </DialogActions>
                 </form>
             </Dialog>
 
-            {/* Dialog de confirmación para eliminar */}
-            <Dialog open={deleteConfirmOpen} onClose={() => setDeleteConfirmOpen(false)}>
+            <Dialog
+                open={deleteConfirmOpen}
+                onClose={() => setDeleteConfirmOpen(false)}
+            >
                 <DialogTitle>Confirmar Eliminación</DialogTitle>
                 <DialogContent>
                     <Typography>
@@ -375,13 +414,10 @@ const Games: React.FC = () => {
                     </Typography>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setDeleteConfirmOpen(false)}>Cancelar</Button>
-                    <Button
-                        onClick={handleConfirmDelete}
-                        color="error"
-                        variant="contained"
-                        disabled={deleteMutation.isPending}
-                    >
+                    <Button onClick={() => setDeleteConfirmOpen(false)}>
+                        Cancelar
+                    </Button>
+                    <Button onClick={handleConfirmDelete} color="error">
                         Eliminar
                     </Button>
                 </DialogActions>

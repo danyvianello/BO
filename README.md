@@ -196,7 +196,7 @@ El proyecto incluye un sistema completo de datos mock que permite desarrollar si
 
 ## 📄 Licencia
 
-Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para más detalles.
+Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para más detalles. 
 
 ## 🆘 Soporte
 

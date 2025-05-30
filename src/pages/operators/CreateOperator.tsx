@@ -5,7 +5,11 @@ import {
     Button,
     Card,
     CardContent,
+    FormControl,
     Grid,
+    InputLabel,
+    MenuItem,
+    Select,
     TextField,
     Typography,
 } from '@mui/material';
@@ -21,6 +25,10 @@ interface CreateOperatorForm {
     code: string;
     email: string;
     description: string;
+    commission: number;
+    maxBet: number;
+    minBet: number;
+    status: 'active' | 'inactive';
 }
 
 const CreateOperator: React.FC = () => {
@@ -44,7 +52,14 @@ const CreateOperator: React.FC = () => {
     });
 
     const onSubmit = (data: CreateOperatorForm) => {
-        mutate(data);
+        // Convertir los valores numéricos
+        const operatorData = {
+            ...data,
+            commission: Number(data.commission),
+            maxBet: Number(data.maxBet),
+            minBet: Number(data.minBet),
+        };
+        mutate(operatorData);
     };
 
     return (
@@ -98,6 +113,76 @@ const CreateOperator: React.FC = () => {
                                     })}
                                     error={!!errors.email}
                                     helperText={errors.email?.message}
+                                />
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <TextField
+                                    fullWidth
+                                    label="Comisión (%)"
+                                    type="number"
+                                    inputProps={{ step: "0.1", min: "0", max: "100" }}
+                                    {...register('commission', {
+                                        required: 'La comisión es requerida',
+                                        min: {
+                                            value: 0,
+                                            message: 'La comisión debe ser mayor a 0',
+                                        },
+                                        max: {
+                                            value: 100,
+                                            message: 'La comisión no puede ser mayor a 100%',
+                                        },
+                                    })}
+                                    error={!!errors.commission}
+                                    helperText={errors.commission?.message}
+                                />
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <FormControl fullWidth error={!!errors.status}>
+                                    <InputLabel>Estado</InputLabel>
+                                    <Select
+                                        label="Estado"
+                                        defaultValue="active"
+                                        {...register('status', {
+                                            required: 'El estado es requerido',
+                                        })}
+                                    >
+                                        <MenuItem value="active">Activo</MenuItem>
+                                        <MenuItem value="inactive">Inactivo</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <TextField
+                                    fullWidth
+                                    label="Apuesta Mínima"
+                                    type="number"
+                                    inputProps={{ step: "0.01", min: "0" }}
+                                    {...register('minBet', {
+                                        required: 'La apuesta mínima es requerida',
+                                        min: {
+                                            value: 0.01,
+                                            message: 'La apuesta mínima debe ser mayor a 0',
+                                        },
+                                    })}
+                                    error={!!errors.minBet}
+                                    helperText={errors.minBet?.message}
+                                />
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <TextField
+                                    fullWidth
+                                    label="Apuesta Máxima"
+                                    type="number"
+                                    inputProps={{ step: "0.01", min: "0" }}
+                                    {...register('maxBet', {
+                                        required: 'La apuesta máxima es requerida',
+                                        min: {
+                                            value: 1,
+                                            message: 'La apuesta máxima debe ser mayor a 0',
+                                        },
+                                    })}
+                                    error={!!errors.maxBet}
+                                    helperText={errors.maxBet?.message}
                                 />
                             </Grid>
                             <Grid item xs={12}>

@@ -41,8 +41,8 @@ const Currencies: React.FC = () => {
 
     const handleStatusChange = (id: string, currentStatus: boolean) => {
         updateCurrencyMutation.mutate({
-            id,
-            data: { is_active: !currentStatus },
+            id: id,
+            data: { status: currentStatus ? 'inactive' : 'active' },
         });
     };
 
@@ -51,22 +51,22 @@ const Currencies: React.FC = () => {
         { field: 'name', headerName: 'Nombre', flex: 1 },
         { field: 'symbol', headerName: 'Símbolo', flex: 1 },
         {
-            field: 'is_active',
+            field: 'status',
             headerName: 'Estado',
             flex: 1,
             renderCell: (params) => (
                 <Switch
-                    checked={params.row.is_active}
-                    onChange={() => handleStatusChange(params.row.id, params.row.is_active)}
+                    checked={params.row.status === 'active'}
+                    onChange={() => handleStatusChange(params.row._id || params.row.id, params.row.status === 'active')}
                     color="primary"
                 />
             ),
         },
         {
-            field: 'createdAt',
+            field: 'created_at',
             headerName: 'Fecha de Creación',
             flex: 1,
-            valueGetter: (params) => formatDate(params.row.createdAt),
+            valueGetter: (params) => formatDate(params.row.created_at || params.row.createdAt),
         },
         {
             field: 'actions',
@@ -77,7 +77,7 @@ const Currencies: React.FC = () => {
                 <Box>
                     <Tooltip title="Editar">
                         <IconButton
-                            onClick={() => navigate(`/currencies/edit/${params.row.id}`)}
+                            onClick={() => navigate(`/currencies/edit/${params.row._id || params.row.id}`)}
                             size="small"
                         >
                             <EditIcon />
@@ -105,7 +105,7 @@ const Currencies: React.FC = () => {
                         </Button>
                     </Box>
                     <DataGrid
-                        rows={currenciesResponse?.data.data || []}
+                        rows={currenciesResponse?.data?.data?.data || []}
                         columns={columns}
                         loading={isLoading}
                         autoHeight
@@ -115,6 +115,7 @@ const Currencies: React.FC = () => {
                                 paginationModel: { pageSize: 10 },
                             },
                         }}
+                        getRowId={(row) => row._id || row.id}
                         disableRowSelectionOnClick
                     />
                 </CardContent>

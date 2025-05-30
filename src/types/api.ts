@@ -24,7 +24,7 @@ export interface LoginResponse {
 }
 
 export interface User {
-    id: string;
+    _id: string;
     username: string;
     email: string;
     role: 'admin' | 'operator' | 'user';
@@ -34,15 +34,21 @@ export interface User {
 }
 
 export interface Operator {
-    id: string;
+    _id?: string;
+    id?: string;
     name: string;
     code: string;
+    email: string;
     status: 'active' | 'inactive';
     commission: number;
     maxBet: number;
     minBet: number;
-    createdAt: string;
-    updatedAt: string;
+    api_key?: string;
+    default_currency?: string;
+    created_at?: string;
+    updated_at?: string;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 export interface Currency {
@@ -58,16 +64,24 @@ export interface Currency {
 }
 
 export interface Game {
-    id: string;
+    _id?: string;
+    id?: string;
     name: string;
-    code: string;
     provider: string;
-    type: string;
+    type: 'slot' | 'table' | 'live' | 'lottery';
     status: 'active' | 'inactive';
-    minBet: number;
-    maxBet: number;
-    createdAt: string;
-    updatedAt: string;
+    description?: string;
+    thumbnail_url?: string;
+    rtp?: number;
+    min_bet?: number;
+    max_bet?: number;
+    currency?: string;
+    is_active?: boolean;
+    config?: Record<string, any>;
+    created_at?: string;
+    updated_at?: string;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 export interface Provider {

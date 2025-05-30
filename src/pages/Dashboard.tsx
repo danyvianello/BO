@@ -80,10 +80,10 @@ const Dashboard: React.FC = () => {
     const totalTransactions = transactionsResponse?.data.data.length || 0;
     const totalSessions = sessionsResponse?.data.data.length || 0;
 
-    const totalAmount = transactionsResponse?.data.data.reduce(
-        (acc: number, curr: any) => acc + curr.amount,
-        0
-    ) || 0;
+    const transactions = transactionsResponse?.data.data || [];
+    const totalAmount = Array.isArray(transactions)
+        ? transactions.reduce((acc: number, curr: any) => acc + (curr.amount || 0), 0)
+        : 0;
 
     return (
         <Box sx={{ p: 3 }}>

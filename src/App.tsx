@@ -79,88 +79,88 @@ const App: React.FC = () => {
         <QueryClientProvider client={queryClient}>
             <ThemeProvider theme={theme}>
                 <div style={{ pointerEvents: 'auto', userSelect: 'auto' }}>
-                    <BrowserRouter>
-                        <Routes>
-                            <Route
-                                path="/login"
-                                element={
-                                    isAuthenticated ? (
-                                        <Navigate to="/" replace />
-                                    ) : (
-                                        <Login />
-                                    )
-                                }
-                            />
-                            <Route
-                                path="/"
-                                element={
-                                    <ProtectedRoute>
-                                        <Layout>
-                                            <Dashboard />
-                                        </Layout>
-                                    </ProtectedRoute>
-                                }
-                            />
-                            <Route
-                                path="/users"
-                                element={
-                                    <ProtectedRoute>
-                                        <Layout>
-                                            <Users />
-                                        </Layout>
-                                    </ProtectedRoute>
-                                }
-                            />
-                            <Route
-                                path="/users/create"
-                                element={
-                                    <ProtectedRoute>
-                                        <Layout>
-                                            <CreateUser />
-                                        </Layout>
-                                    </ProtectedRoute>
-                                }
-                            />
-                            <Route
-                                path="/operators"
-                                element={
-                                    <ProtectedRoute>
-                                        <Layout>
-                                            <Operators />
-                                        </Layout>
-                                    </ProtectedRoute>
-                                }
-                            />
-                            <Route
-                                path="/operators/create"
-                                element={
-                                    <ProtectedRoute>
-                                        <Layout>
-                                            <CreateOperator />
-                                        </Layout>
-                                    </ProtectedRoute>
-                                }
-                            />
-                            <Route
-                                path="/currencies"
-                                element={
-                                    <ProtectedRoute>
-                                        <Layout>
-                                            <Currencies />
-                                        </Layout>
-                                    </ProtectedRoute>
-                                }
-                            />
-                            <Route
-                                path="/currencies/create"
-                                element={
-                                    <ProtectedRoute>
-                                        <Layout>
-                                            <CreateCurrency />
-                                        </Layout>
-                                    </ProtectedRoute>
-                                }
-                            />
+                <BrowserRouter>
+                    <Routes>
+                        <Route
+                            path="/login"
+                            element={
+                                isAuthenticated ? (
+                                    <Navigate to="/" replace />
+                                ) : (
+                                    <Login />
+                                )
+                            }
+                        />
+                        <Route
+                            path="/"
+                            element={
+                                <ProtectedRoute>
+                                    <Layout>
+                                        <Dashboard />
+                                    </Layout>
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/users"
+                            element={
+                                <ProtectedRoute>
+                                    <Layout>
+                                        <Users />
+                                    </Layout>
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/users/create"
+                            element={
+                                <ProtectedRoute>
+                                    <Layout>
+                                        <CreateUser />
+                                    </Layout>
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/operators"
+                            element={
+                                <ProtectedRoute>
+                                    <Layout>
+                                        <Operators />
+                                    </Layout>
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/operators/create"
+                            element={
+                                <ProtectedRoute>
+                                    <Layout>
+                                        <CreateOperator />
+                                    </Layout>
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/currencies"
+                            element={
+                                <ProtectedRoute>
+                                    <Layout>
+                                        <Currencies />
+                                    </Layout>
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/currencies/create"
+                            element={
+                                <ProtectedRoute>
+                                    <Layout>
+                                        <CreateCurrency />
+                                    </Layout>
+                                </ProtectedRoute>
+                            }
+                        />
                             <Route
                                 path="/games"
                                 element={
@@ -215,9 +215,9 @@ const App: React.FC = () => {
                                 path="/test"
                                 element={<TestPage />}
                             />
-                            <Route path="*" element={<Navigate to="/" replace />} />
-                        </Routes>
-                    </BrowserRouter>
+                        <Route path="*" element={<Navigate to="/" replace />} />
+                    </Routes>
+                </BrowserRouter>
                 </div>
             </ThemeProvider>
         </QueryClientProvider>

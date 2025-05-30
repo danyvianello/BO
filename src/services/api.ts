@@ -56,71 +56,121 @@ api.interceptors.response.use(
     }
 );
 
+// Servicios de Autenticación
+export const login = (credentials: { username: string; password: string }) => {
+    const formData = new URLSearchParams();
+    formData.append('username', credentials.username);
+    formData.append('password', credentials.password);
+    return api.post<ApiResponse<LoginResponse>>('/token', formData, {
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+    });
+};
+
+export const logout = () =>
+    api.post<ApiResponse<null>>('/logout');
+
 // Servicios de Usuarios
-export const getUsers = () => api.get<ApiResponse<PaginatedResponse<User>>>('/users');
-export const createUser = (data: Omit<User, 'id' | 'createdAt' | 'updatedAt'>) =>
-    api.post<ApiResponse<User>>('/users', data);
-export const updateUser = (id: string, data: Partial<User>) =>
-    api.put<ApiResponse<User>>(`/users/${id}`, data);
-export const deleteUser = (id: string) => api.delete<ApiResponse<void>>(`/users/${id}`);
+export const getUsers = () =>
+    api.get<ApiResponse<PaginatedResponse<User>>>('/users');
+
+export const createUser = (userData: Omit<User, 'id' | 'createdAt' | 'updatedAt'>) =>
+    api.post<ApiResponse<User>>('/users', userData);
+
+export const updateUser = (id: string, userData: Partial<User>) =>
+    api.put<ApiResponse<User>>(`/users/${id}`, userData);
+
+export const deleteUser = (id: string) =>
+    api.delete<ApiResponse<null>>(`/users/${id}`);
 
 // Servicios de Operadores
-export const getOperators = () => api.get<ApiResponse<PaginatedResponse<Operator>>>('/operators');
-export const createOperator = (data: Omit<Operator, 'id' | 'createdAt' | 'updatedAt'>) =>
-    api.post<ApiResponse<Operator>>('/operators', data);
-export const updateOperator = (id: string, data: Partial<Operator>) =>
-    api.put<ApiResponse<Operator>>(`/operators/${id}`, data);
-export const deleteOperator = (id: string) => api.delete<ApiResponse<void>>(`/operators/${id}`);
+export const getOperators = () =>
+    api.get<ApiResponse<PaginatedResponse<Operator>>>('/operators');
+
+export const createOperator = (operatorData: Omit<Operator, 'id' | 'createdAt' | 'updatedAt'>) =>
+    api.post<ApiResponse<Operator>>('/operators', operatorData);
+
+export const updateOperator = (id: string, operatorData: Partial<Operator>) =>
+    api.put<ApiResponse<Operator>>(`/operators/${id}`, operatorData);
+
+export const deleteOperator = (id: string) =>
+    api.delete<ApiResponse<null>>(`/operators/${id}`);
 
 // Servicios de Monedas
-export const getCurrencies = () => api.get<ApiResponse<PaginatedResponse<Currency>>>('/currencies');
-export const createCurrency = (data: Omit<Currency, 'id' | 'createdAt' | 'updatedAt'>) =>
-    api.post<ApiResponse<Currency>>('/currencies', data);
-export const updateCurrency = (id: string, data: Partial<Currency>) =>
-    api.put<ApiResponse<Currency>>(`/currencies/${id}`, data);
-export const deleteCurrency = (id: string) => api.delete<ApiResponse<void>>(`/currencies/${id}`);
+export const getCurrencies = () =>
+    api.get<ApiResponse<PaginatedResponse<Currency>>>('/currencies');
 
-// Servicios de Autenticación
-export const login = async (credentials: { username: string; password: string }) => {
-    const response = await api.post<ApiResponse<LoginResponse>>('/auth/login', credentials);
-    const { token, user } = response.data.data;
-    storage.setToken(token);
-    storage.setUser(user);
-    return response;
-};
+export const createCurrency = (currencyData: Omit<Currency, 'id' | 'createdAt' | 'updatedAt'>) =>
+    api.post<ApiResponse<Currency>>('/currencies', currencyData);
 
-export const logout = async () => {
-    await api.post<ApiResponse<void>>('/auth/logout');
-    storage.clear();
-};
+export const updateCurrency = (id: string, currencyData: Partial<Currency>) =>
+    api.put<ApiResponse<Currency>>(`/currencies/${id}`, currencyData);
+
+export const deleteCurrency = (id: string) =>
+    api.delete<ApiResponse<null>>(`/currencies/${id}`);
 
 // Servicios de Juegos
-export const getGames = () => api.get<ApiResponse<PaginatedResponse<Game>>>('/games');
-export const createGame = (data: Omit<Game, 'id' | 'createdAt' | 'updatedAt'>) =>
-    api.post<ApiResponse<Game>>('/games', data);
-export const updateGame = (id: string, data: Partial<Game>) =>
-    api.put<ApiResponse<Game>>(`/games/${id}`, data);
-export const deleteGame = (id: string) => api.delete<ApiResponse<void>>(`/games/${id}`);
+export const getGames = () =>
+    api.get<ApiResponse<PaginatedResponse<Game>>>('/games');
+
+export const createGame = (gameData: Omit<Game, 'id' | 'createdAt' | 'updatedAt'>) =>
+    api.post<ApiResponse<Game>>('/games', gameData);
+
+export const updateGame = (id: string, gameData: Partial<Game>) =>
+    api.put<ApiResponse<Game>>(`/games/${id}`, gameData);
+
+export const deleteGame = (id: string) =>
+    api.delete<ApiResponse<null>>(`/games/${id}`);
 
 // Servicios de Proveedores
-export const getProviders = () => api.get<ApiResponse<PaginatedResponse<Provider>>>('/providers');
-export const createProvider = (data: Omit<Provider, 'id' | 'createdAt' | 'updatedAt'>) =>
-    api.post<ApiResponse<Provider>>('/providers', data);
-export const updateProvider = (id: string, data: Partial<Provider>) =>
-    api.put<ApiResponse<Provider>>(`/providers/${id}`, data);
-export const deleteProvider = (id: string) => api.delete<ApiResponse<void>>(`/providers/${id}`);
+export const getProviders = () =>
+    api.get<ApiResponse<PaginatedResponse<Provider>>>('/providers');
+
+export const createProvider = (providerData: Omit<Provider, 'id' | 'createdAt' | 'updatedAt'>) =>
+    api.post<ApiResponse<Provider>>('/providers', providerData);
+
+export const updateProvider = (id: string, providerData: Partial<Provider>) =>
+    api.put<ApiResponse<Provider>>(`/providers/${id}`, providerData);
+
+export const deleteProvider = (id: string) =>
+    api.delete<ApiResponse<null>>(`/providers/${id}`);
 
 // Servicios de Sesiones
-export const getSessions = () => api.get<ApiResponse<PaginatedResponse<Session>>>('/sessions');
-export const getSession = (id: string) => api.get<ApiResponse<Session>>(`/sessions/${id}`);
+export const getSessions = () =>
+    api.get<ApiResponse<PaginatedResponse<Session>>>('/sessions');
 
-// Servicios de Reportes
-export const getReports = (params: any) => api.get<ApiResponse<PaginatedResponse<Report>>>('/reports', { params });
-export const generateReport = (type: string, params: any) =>
-    api.post<ApiResponse<Report>>(`/reports/${type}`, params);
+export const getSession = (id: string) =>
+    api.get<ApiResponse<Session>>(`/sessions/${id}`);
 
 // Servicios de Transacciones
-export const getTransactions = (params: any) => api.get<ApiResponse<PaginatedResponse<Transaction>>>('/transactions', { params });
-export const getTransaction = (id: string) => api.get<ApiResponse<Transaction>>(`/transactions/${id}`);
+export const getTransactions = (params?: {
+    page?: number;
+    limit?: number;
+    startDate?: string;
+    endDate?: string;
+    operatorId?: string;
+    userId?: string;
+    gameId?: string;
+    type?: string;
+}) =>
+    api.get<ApiResponse<PaginatedResponse<Transaction>>>('/transactions', { params });
+
+export const getTransaction = (id: string) =>
+    api.get<ApiResponse<Transaction>>(`/transactions/${id}`);
+
+// Servicios de Reportes
+export const getReports = (params?: any) =>
+    api.get<ApiResponse<PaginatedResponse<Report>>>('/reports', { params });
+
+export const generateReport = (params: any) =>
+    api.post<ApiResponse<Report>>('/reports/generate', params);
+
+// Wallet reconciliation and manual adjustment
+export const getWalletReconciliation = (userId: string) =>
+    api.get<ApiResponse<any>>(`/wallets/${userId}`);
+
+export const adjustWalletBalance = (userId: string, newBalance: number, reason: string, operator: string) =>
+    api.post<ApiResponse<any>>(`/wallets/${userId}/adjust`, { new_balance: newBalance, reason, operator });
 
 export default api; 

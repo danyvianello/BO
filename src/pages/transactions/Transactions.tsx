@@ -47,7 +47,13 @@ const Transactions: React.FC = () => {
 
     const { data: transactionsResponse, isLoading, refetch } = useQuery({
         queryKey: ['transactions', filters],
-        queryFn: () => getTransactions(filters),
+        queryFn: () => getTransactions({
+            type: filters.type || undefined,
+            status: filters.status || undefined,
+            currency: filters.currency || undefined,
+            startDate: filters.startDate || undefined,
+            endDate: filters.endDate || undefined
+        }),
     });
 
     const handleViewTransaction = async (transactionId: string) => {

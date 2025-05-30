@@ -34,10 +34,10 @@ const Operators: React.FC = () => {
             valueGetter: (params) => formatStatus(params.row.status),
         },
         {
-            field: 'createdAt',
+            field: 'created_at',
             headerName: 'Fecha de Creación',
             flex: 1,
-            valueGetter: (params) => formatDate(params.row.createdAt),
+            valueGetter: (params) => formatDate(params.row.created_at || params.row.createdAt),
         },
         {
             field: 'actions',
@@ -48,7 +48,7 @@ const Operators: React.FC = () => {
                 <Box>
                     <Tooltip title="Editar">
                         <IconButton
-                            onClick={() => navigate(`/operators/edit/${params.row.id}`)}
+                            onClick={() => navigate(`/operators/edit/${params.row._id || params.row.id}`)}
                             size="small"
                         >
                             <EditIcon />
@@ -56,7 +56,7 @@ const Operators: React.FC = () => {
                     </Tooltip>
                     <Tooltip title="Eliminar">
                         <IconButton
-                            onClick={() => handleDelete(params.row.id)}
+                            onClick={() => handleDelete(params.row._id || params.row.id)}
                             size="small"
                             color="error"
                         >
@@ -90,7 +90,7 @@ const Operators: React.FC = () => {
                         </Button>
                     </Box>
                     <DataGrid
-                        rows={operatorsResponse?.data.data || []}
+                        rows={operatorsResponse?.data?.data?.data || []}
                         columns={columns}
                         loading={isLoading}
                         autoHeight
@@ -100,6 +100,7 @@ const Operators: React.FC = () => {
                                 paginationModel: { pageSize: 10 },
                             },
                         }}
+                        getRowId={(row) => row._id || row.id}
                         disableRowSelectionOnClick
                     />
                 </CardContent>

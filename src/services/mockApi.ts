@@ -12,6 +12,12 @@ import {
     PaginatedResponse,
     LoginResponse
 } from '../types/api';
+import { config } from '../config';
+
+// Solo mostrar log si showDevLogs es true
+if (config.showDevLogs) {
+    console.log('Mock API inicializado');
+}
 
 // Configuración de usuarios para desarrollo
 // IMPORTANTE: En producción, esto debe venir de variables de entorno o API segura
@@ -216,6 +222,7 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 export const mockApi = {
     // Auth - Versión más segura
     login: async (credentials: { username: string; password: string }) => {
+        console.log('Mock API: login llamado');
         await delay(1000);
 
         // Buscar usuario válido
@@ -247,6 +254,7 @@ export const mockApi = {
 
     // Users
     getUsers: async () => {
+        console.log('Mock API: getUsers llamado');
         await delay(800);
         const response: ApiResponse<PaginatedResponse<User>> = {
             data: {

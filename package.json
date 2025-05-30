@@ -25,6 +25,7 @@
         "zustand": "^4.5.1"
     },
     "devDependencies": {
+        "@babel/plugin-transform-react-jsx": "^7.27.1",
         "@types/node": "^20.11.19",
         "@types/react": "^18.2.55",
         "@types/react-dom": "^18.2.19",

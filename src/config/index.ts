@@ -1,15 +1,15 @@
 // Configuración principal de la aplicación
 export const config = {
-    // API Configuration
-    apiUrl: import.meta.env.VITE_API_URL || 'http://localhost:8000',
-    wsUrl: import.meta.env.VITE_WS_URL || 'ws://localhost:8000',
+    // API Configuration - Conectar al Engine Python
+    apiUrl: import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api/v1/backoffice',
+    wsUrl: import.meta.env.VITE_WS_URL || 'ws://127.0.0.1:8000',
 
     // App Configuration
     appTitle: import.meta.env.VITE_APP_TITLE || 'RGS Backoffice',
 
     // Development Configuration
-    useMockApi: import.meta.env.VITE_USE_MOCK_API !== 'false', // Por defecto true
     isDevelopment: import.meta.env.DEV,
+    showDevLogs: false, // Desactivar logs de desarrollo
 
     // Auth Configuration
     auth: {

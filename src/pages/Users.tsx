@@ -20,6 +20,8 @@ import {
     updateUser,
     getUserWallet,
     updateWalletBalance,
+    adjustWalletBalance,
+    getWalletReconciliation,
 } from '../services/api';
 
 interface User {
@@ -39,6 +41,7 @@ export default function Users() {
     const [pageSize, setPageSize] = useState(10);
     const [openDialog, setOpenDialog] = useState(false);
     const [openWalletDialog, setOpenWalletDialog] = useState(false);
+    const [openAdjustDialog, setOpenAdjustDialog] = useState(false);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [formData, setFormData] = useState({
         email: '',
@@ -47,6 +50,11 @@ export default function Users() {
         password: '',
     });
     const [walletAmount, setWalletAmount] = useState('');
+    const [adjustAmount, setAdjustAmount] = useState('');
+    const [adjustReason, setAdjustReason] = useState('');
+    const [adjustError, setAdjustError] = useState('');
+    const [adjustLoading, setAdjustLoading] = useState(false);
+    const [walletRecon, setWalletRecon] = useState<any>(null);
     const [error, setError] = useState('');
 
     const queryClient = useQueryClient();
@@ -138,6 +146,52 @@ export default function Users() {
         setError('');
     };
 
+    const handleOpenAdjustDialog = async (user: User) => {
+        setSelectedUser(user);
+        setAdjustError('');
+        setAdjustLoading(true);
+        try {
+            const res = await getWalletReconciliation(user.id);
+            setWalletRecon(res.data.data);
+            setAdjustAmount(res.data.data.wallet.balance.toString());
+        } catch (e: any) {
+            setWalletRecon(null);
+            setAdjustAmount(user.wallet?.balance?.toString() || '');
+            setAdjustError('Could not fetch wallet info');
+        }
+        setAdjustReason('');
+        setAdjustLoading(false);
+        setOpenAdjustDialog(true);
+    };
+
+    const handleCloseAdjustDialog = () => {
+        setOpenAdjustDialog(false);
+        setSelectedUser(null);
+        setAdjustAmount('');
+        setAdjustReason('');
+        setAdjustError('');
+        setWalletRecon(null);
+    };
+
+    const handleAdjustSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!selectedUser) return;
+        setAdjustLoading(true);
+        setAdjustError('');
+        try {
+            await adjustWalletBalance(selectedUser.id, parseFloat(adjustAmount), adjustReason, 'admin');
+            setOpenAdjustDialog(false);
+            setSelectedUser(null);
+            setAdjustAmount('');
+            setAdjustReason('');
+            setWalletRecon(null);
+            queryClient.invalidateQueries({ queryKey: ['users'] });
+        } catch (err: any) {
+            setAdjustError(err.response?.data?.detail || 'Error adjusting balance');
+        }
+        setAdjustLoading(false);
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (selectedUser) {
@@ -176,7 +230,7 @@ export default function Users() {
         {
             field: 'actions',
             headerName: 'Acciones',
-            width: 200,
+            width: 300,
             renderCell: (params) => (
                 <Box>
                     <IconButton
@@ -192,6 +246,15 @@ export default function Users() {
                         sx={{ ml: 1 }}
                     >
                         Gestionar Balance
+                    </Button>
+                    <Button
+                        variant="contained"
+                        size="small"
+                        color="secondary"
+                        onClick={() => handleOpenAdjustDialog(params.row)}
+                        sx={{ ml: 1 }}
+                    >
+                        Ajustar Saldo
                     </Button>
                 </Box>
             ),
@@ -316,6 +379,54 @@ export default function Users() {
                         <Button onClick={handleCloseWalletDialog}>Cancelar</Button>
                         <Button type="submit" variant="contained">
                             Actualizar Balance
+                        </Button>
+                    </DialogActions>
+                </form>
+            </Dialog>
+
+            <Dialog open={openAdjustDialog} onClose={handleCloseAdjustDialog}>
+                <DialogTitle>Ajustar Saldo Manual</DialogTitle>
+                <form onSubmit={handleAdjustSubmit}>
+                    <DialogContent>
+                        {adjustError && (
+                            <Alert severity="error" sx={{ mb: 2 }}>{adjustError}</Alert>
+                        )}
+                        {walletRecon && (
+                            <>
+                                <Typography variant="body2" sx={{ mb: 1 }}>
+                                    <b>Current Balance:</b> {walletRecon.wallet.balance} {walletRecon.wallet.currency}
+                                </Typography>
+                                <Typography variant="body2" sx={{ mb: 1 }}>
+                                    <b>Calculated Balance:</b> {walletRecon.calculated_balance} {walletRecon.wallet.currency}
+                                </Typography>
+                                <Typography variant="body2" sx={{ mb: 2 }} color={walletRecon.difference !== 0 ? 'error' : 'success.main'}>
+                                    <b>Difference:</b> {walletRecon.difference}
+                                </Typography>
+                            </>
+                        )}
+                        <TextField
+                            margin="dense"
+                            label="New Balance"
+                            type="number"
+                            fullWidth
+                            required
+                            value={adjustAmount}
+                            onChange={e => setAdjustAmount(e.target.value)}
+                            sx={{ mb: 2 }}
+                        />
+                        <TextField
+                            margin="dense"
+                            label="Reason"
+                            fullWidth
+                            required
+                            value={adjustReason}
+                            onChange={e => setAdjustReason(e.target.value)}
+                        />
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCloseAdjustDialog}>Cancel</Button>
+                        <Button type="submit" variant="contained" disabled={adjustLoading}>
+                            {adjustLoading ? 'Adjusting...' : 'Adjust'}
                         </Button>
                     </DialogActions>
                 </form>

@@ -3,7 +3,6 @@
 export const SecurityConfig = {
     // Configuración de desarrollo
     isDevelopment: import.meta.env.DEV,
-    useMockApi: import.meta.env.VITE_USE_MOCK_API === 'true',
 
     // URLs de API
     apiUrl: import.meta.env.VITE_API_URL || 'http://localhost:8000',
@@ -21,8 +20,7 @@ export const SecurityConfig = {
         defaultCredentials: {
             username: import.meta.env.VITE_ADMIN_USER || 'admin',
             password: import.meta.env.VITE_ADMIN_PASS || 'admin123'
-        },
-        showCredentialsInConsole: import.meta.env.DEV && import.meta.env.VITE_SHOW_DEV_CREDENTIALS === 'true'
+        }
     },
 
     // Configuración de producción
@@ -51,21 +49,12 @@ export const getSecurityConfig = () => {
 
 // Función para validar si estamos en modo seguro
 export const isSecureMode = () => {
-    return !SecurityConfig.isDevelopment || !SecurityConfig.useMockApi;
+    return !SecurityConfig.isDevelopment;
 };
 
 // Función para mostrar advertencias de seguridad
 export const showSecurityWarnings = () => {
-    if (SecurityConfig.isDevelopment && SecurityConfig.useMockApi) {
-        console.warn('🚨 MODO DESARROLLO ACTIVO');
-        console.warn('📝 Usando datos mock para desarrollo');
-        console.warn('🔐 Credenciales de prueba activas');
-        console.warn('⚠️  NO usar en producción');
-
-        if (SecurityConfig.development.showCredentialsInConsole) {
-            console.info('👤 Credenciales de desarrollo:');
-            console.info(`   Usuario: ${SecurityConfig.development.defaultCredentials.username}`);
-            console.info(`   Contraseña: ${SecurityConfig.development.defaultCredentials.password}`);
-        }
+    if (SecurityConfig.isDevelopment) {
+        console.info('🔧 Modo desarrollo activo');
     }
 }; 

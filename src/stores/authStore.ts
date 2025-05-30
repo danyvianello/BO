@@ -25,8 +25,15 @@ export const useAuthStore = create<AuthState>()(
             login: async (username: string, password: string) => {
                 try {
                     const response = await loginService({ username, password });
-                    const { user, token } = response.data.data;
-                    storage.setToken(token);
+                    const { access_token } = response.data;
+                    storage.setToken(access_token);
+                    // Crear un objeto de usuario básico
+                    const user = {
+                        id: 1,
+                        username: username,
+                        email: 'admin@rgs.com',
+                        role: 'admin'
+                    };
                     storage.setUser(user);
                     set({ user, isAuthenticated: true });
                 } catch (error) {

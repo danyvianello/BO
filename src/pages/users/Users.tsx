@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     Box,
     Button,
@@ -7,20 +7,43 @@ import {
     Typography,
     IconButton,
     Tooltip,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
 } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { getUsers } from '../../services/api';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getUsers, deleteUser } from '../../services/api';
 import { User } from '../../types/api';
 import { formatDate, formatRole, formatStatus } from '../../utils/formatters';
+import { useUIStore } from '../../stores/uiStore';
 
 const Users: React.FC = () => {
     const navigate = useNavigate();
+    const { addNotification } = useUIStore();
+    const queryClient = useQueryClient();
+    const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+    const [userToDelete, setUserToDelete] = useState<User | null>(null);
+
     const { data: usersResponse, isLoading } = useQuery({
         queryKey: ['users'],
         queryFn: getUsers,
+    });
+
+    const deleteMutation = useMutation({
+        mutationFn: deleteUser,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['users'] });
+            addNotification('Usuario eliminado exitosamente', 'success');
+            setDeleteConfirmOpen(false);
+            setUserToDelete(null);
+        },
+        onError: (error: any) => {
+            addNotification(error.message || 'Error al eliminar el usuario', 'error');
+        },
     });
 
     const columns: GridColDef[] = [
@@ -39,10 +62,10 @@ const Users: React.FC = () => {
             valueGetter: (params) => formatStatus(params.row.status),
         },
         {
-            field: 'createdAt',
+            field: 'created_at',
             headerName: 'Fecha de Creación',
             flex: 1,
-            valueGetter: (params) => formatDate(params.row.createdAt),
+            valueGetter: (params) => formatDate(params.row.created_at || params.row.createdAt),
         },
         {
             field: 'actions',
@@ -53,7 +76,7 @@ const Users: React.FC = () => {
                 <Box>
                     <Tooltip title="Editar">
                         <IconButton
-                            onClick={() => navigate(`/users/edit/${params.row.id}`)}
+                            onClick={() => navigate(`/users/edit/${params.row._id || params.row.id}`)}
                             size="small"
                         >
                             <EditIcon />
@@ -61,7 +84,7 @@ const Users: React.FC = () => {
                     </Tooltip>
                     <Tooltip title="Eliminar">
                         <IconButton
-                            onClick={() => handleDelete(params.row.id)}
+                            onClick={() => handleDeleteClick(params.row)}
                             size="small"
                             color="error"
                         >
@@ -73,9 +96,15 @@ const Users: React.FC = () => {
         },
     ];
 
-    const handleDelete = async (id: string) => {
-        // TODO: Implementar lógica de eliminación
-        console.log('Eliminar usuario:', id);
+    const handleDeleteClick = (user: User) => {
+        setUserToDelete(user);
+        setDeleteConfirmOpen(true);
+    };
+
+    const handleConfirmDelete = () => {
+        if (userToDelete) {
+            deleteMutation.mutate(userToDelete._id || userToDelete.id);
+        }
     };
 
     return (
@@ -95,7 +124,7 @@ const Users: React.FC = () => {
                         </Button>
                     </Box>
                     <DataGrid
-                        rows={usersResponse?.data.data || []}
+                        rows={usersResponse?.data?.data?.data || []}
                         columns={columns}
                         loading={isLoading}
                         autoHeight
@@ -105,10 +134,27 @@ const Users: React.FC = () => {
                                 paginationModel: { pageSize: 10 },
                             },
                         }}
+                        getRowId={(row) => row._id || row.id}
                         disableRowSelectionOnClick
                     />
                 </CardContent>
             </Card>
+
+            <Dialog
+                open={deleteConfirmOpen}
+                onClose={() => setDeleteConfirmOpen(false)}
+            >
+                <DialogTitle>Confirmar Eliminación</DialogTitle>
+                <DialogContent>
+                    ¿Está seguro que desea eliminar el usuario {userToDelete?.username}?
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setDeleteConfirmOpen(false)}>Cancelar</Button>
+                    <Button onClick={handleConfirmDelete} color="error" variant="contained">
+                        Eliminar
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 };

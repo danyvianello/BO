@@ -11,9 +11,9 @@ import {
     Typography,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useMutation } from '@tanstack/react-query';
-import { createUser } from '../../services/api';
-import { User } from '../../types/api';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { createUser, getOperators } from '../../services/api';
+import { User, Operator } from '../../types/api';
 import { validateEmail, validatePassword, validateUsername } from '../../utils/validators';
 import { useUIStore } from '../../stores/uiStore';
 
@@ -22,6 +22,7 @@ interface CreateUserForm {
     email: string;
     password: string;
     role: User['role'];
+    operator_id?: string;
 }
 
 const CreateUser: React.FC = () => {
@@ -31,7 +32,21 @@ const CreateUser: React.FC = () => {
         register,
         handleSubmit,
         formState: { errors },
-    } = useForm<CreateUserForm>();
+        setValue,
+        control,
+    } = useForm<CreateUserForm>({
+        defaultValues: {
+            role: 'user',
+            operator_id: 'system'
+        }
+    });
+
+    const { data: operatorsResponse } = useQuery({
+        queryKey: ['operators'],
+        queryFn: getOperators,
+    });
+
+    const operators = operatorsResponse?.data?.data?.data || [];
 
     const { mutate, isLoading } = useMutation({
         mutationFn: createUser,
@@ -105,6 +120,7 @@ const CreateUser: React.FC = () => {
                                     fullWidth
                                     select
                                     label="Rol"
+                                    defaultValue="user"
                                     {...register('role', {
                                         required: 'El rol es requerido',
                                     })}
@@ -114,6 +130,26 @@ const CreateUser: React.FC = () => {
                                     <MenuItem value="admin">Administrador</MenuItem>
                                     <MenuItem value="operator">Operador</MenuItem>
                                     <MenuItem value="user">Usuario</MenuItem>
+                                </TextField>
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <TextField
+                                    fullWidth
+                                    select
+                                    label="Operador"
+                                    defaultValue="system"
+                                    {...register('operator_id', {
+                                        required: 'El operador es requerido',
+                                    })}
+                                    error={!!errors.operator_id}
+                                    helperText={errors.operator_id?.message}
+                                >
+                                    <MenuItem value="system">Sistema</MenuItem>
+                                    {operators.map((operator: Operator) => (
+                                        <MenuItem key={operator.id} value={operator.id}>
+                                            {operator.name}
+                                        </MenuItem>
+                                    ))}
                                 </TextField>
                             </Grid>
                             <Grid item xs={12}>

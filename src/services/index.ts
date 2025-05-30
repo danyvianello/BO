@@ -2,7 +2,16 @@ import { config } from '../config';
 import { mockApi } from './mockApi';
 import * as realApi from './api';
 
+// Log para debug
+console.log('useMockApi:', config.useMockApi);
+
 // Exportar automáticamente mock o API real según configuración
+const api = config.useMockApi ? mockApi : realApi;
+
+// Log para debug
+console.log('API seleccionada:', config.useMockApi ? 'mockApi' : 'realApi');
+
+// Exportar todos los servicios
 export const {
     // Auth
     login,
@@ -49,7 +58,7 @@ export const {
     // Reports
     getReports,
     generateReport,
-} = config.useMockApi ? mockApi : realApi;
+} = api;
 
 // También exportar la instancia de axios por si se necesita
 export { default as api } from './api'; 
