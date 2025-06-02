@@ -1,211 +1,165 @@
-# 🎰 RGS Backoffice
+# 🎮 Backoffice RGS
 
-Sistema de administración completo para Remote Gaming Server (RGS) que permite gestionar operadores, juegos, proveedores y transacciones de manera eficiente y profesional.
+Panel de administración para el ecosistema RGS, desarrollado con React y Material-UI. Permite gestionar usuarios, operadores, ver reportes y monitorear el sistema.
 
-## ✨ Características Principales
+## 🚀 Características
 
-- 🔐 **Autenticación JWT** - Sistema de login seguro con protección de rutas
-- 👥 **Gestión de Usuarios** - CRUD completo con roles y permisos
-- 🏢 **Gestión de Operadores** - Administración de casinos y configuraciones
-- 💰 **Gestión de Monedas** - Soporte multi-moneda con tasas de cambio
-- 🎮 **Administración de Juegos** - Catálogo completo con límites de apuesta
-- 🔧 **Gestión de Proveedores** - Integración con proveedores de juegos
-- 📊 **Sesiones de Juego** - Monitoreo en tiempo real de actividad
-- 💳 **Transacciones** - Seguimiento completo de apuestas y ganancias
-- 📈 **Reportes** - Generación y descarga de reportes personalizados
-- 🌐 **Interfaz Responsive** - Optimizada para desktop y móvil
-- 🎨 **Material UI** - Diseño moderno y profesional
+- Dashboard con métricas en tiempo real
+- Gestión de usuarios y operadores
+- Reportes detallados de transacciones
+- Monitoreo de sesiones activas
+- Gráficos y estadísticas
+- Interfaz responsive y moderna
 
-## 🚀 Tecnologías
+## 🛠️ Requisitos
 
-- **Frontend:** React 18 + TypeScript
-- **UI Framework:** Material UI v5
-- **Routing:** React Router v6
-- **State Management:** Zustand + React Query
-- **Forms:** React Hook Form
-- **HTTP Client:** Axios
-- **Build Tool:** Vite
-- **Styling:** CSS-in-JS + Material UI
+- Node.js 16+
+- npm 8+
+- React 18+
+- Material-UI 5+
 
-## 📋 Requisitos
+## 📦 Instalación
 
-- Node.js 18 o superior
-- npm 9 o superior
-- Navegador moderno (Chrome, Firefox, Safari, Edge)
-
-## 🛠️ Instalación y Configuración
-
-1. **Clonar el repositorio:**
+1. Clonar el repositorio:
 ```bash
-git clone <tu-repositorio-url>
+git clone https://github.com/your-org/rgs-backoffice.git
 cd rgs-backoffice
 ```
 
-2. **Instalar dependencias:**
+2. Instalar dependencias:
 ```bash
 npm install
 ```
 
-3. **Configurar variables de entorno (opcional):**
+3. Configurar variables de entorno:
 ```bash
-# Crear archivo .env en la raíz del proyecto
-VITE_API_URL=http://localhost:8000
-VITE_WS_URL=ws://localhost:8000
-VITE_APP_TITLE=RGS Backoffice
-VITE_USE_MOCK_API=true
+cp .env.example .env
+# Editar .env con tus configuraciones
 ```
 
-4. **Iniciar el servidor de desarrollo:**
+## 🚀 Iniciar el Servidor de Desarrollo
+
 ```bash
 npm run dev
 ```
 
-5. **Abrir en el navegador:**
-```
-http://localhost:3000
-```
-
-## 🔑 Credenciales de Acceso
-
-Para acceder al sistema en modo desarrollo:
-
-- **Usuario:** `admin`
-- **Contraseña:** `admin123`
+La aplicación estará disponible en `http://localhost:3000`
 
 ## 🏗️ Estructura del Proyecto
 
 ```
 src/
 ├── components/     # Componentes reutilizables
-├── config/        # Configuración de la aplicación
-├── hooks/         # Hooks personalizados
-├── layouts/       # Layouts de la aplicación
-├── pages/         # Páginas de la aplicación
-├── services/      # Servicios de API
-├── stores/        # Estado global (Zustand)
-├── types/         # Tipos TypeScript
+├── pages/         # Páginas principales
+├── services/      # Servicios API
+├── hooks/         # Custom hooks
 ├── utils/         # Utilidades
-└── App.tsx        # Componente principal
+├── context/       # Contextos React
+└── assets/        # Recursos estáticos
 ```
 
-## 🎯 Funcionalidades Implementadas
+## 📚 Documentación de Componentes
 
-### 🔐 Sistema de Autenticación
-- ✅ Login/Logout con JWT
-- ✅ Protección de rutas privadas
-- ✅ Persistencia de sesión
-- ✅ Manejo automático de tokens
+### Páginas Principales
+- `/dashboard` - Vista general del sistema
+- `/users` - Gestión de usuarios
+- `/operators` - Gestión de operadores
+- `/reports` - Reportes y estadísticas
+- `/sessions` - Monitoreo de sesiones
 
-### 👥 Gestión de Usuarios
-- ✅ CRUD completo (Crear, Leer, Actualizar, Eliminar)
-- ✅ Asignación de roles (Admin, Operador, Usuario)
-- ✅ Control de estado (Activo/Inactivo)
-- ✅ Validación de formularios
+### Componentes Clave
+- `DashboardCard` - Tarjetas de métricas
+- `DataTable` - Tabla de datos con paginación
+- `Chart` - Gráficos y visualizaciones
+- `UserForm` - Formulario de usuario
+- `ReportFilter` - Filtros de reportes
 
-### 🏢 Gestión de Operadores
-- ✅ Configuración de casinos
-- ✅ Gestión de comisiones
-- ✅ Límites de apuestas personalizables
-- ✅ Control de estado y activación
+## 🔑 Integración con RGS
 
-### 💰 Gestión de Monedas
-- ✅ Soporte multi-moneda
-- ✅ Tasas de cambio dinámicas
-- ✅ Configuración de decimales
-- ✅ Símbolos de moneda
+Ejemplo de llamada a la API:
 
-### 🎮 Gestión de Juegos
-- ✅ Catálogo completo de juegos
-- ✅ Integración con proveedores
-- ✅ Configuración de límites
-- ✅ Categorización por tipo
+```javascript
+import { api } from '../services/api';
 
-### 🔧 Gestión de Proveedores
-- ✅ Registro de proveedores de juegos
-- ✅ Configuración de API Keys
-- ✅ Estado y activación
-- ✅ Integración segura
+// Obtener usuarios
+const getUsers = async () => {
+  const response = await api.get('/api/v1/backoffice/users');
+  return response.data;
+};
 
-### 📊 Monitoreo de Sesiones
-- ✅ Visualización en tiempo real
-- ✅ Detalles completos de sesión
-- ✅ Cálculo de ganancias/pérdidas
-- ✅ Duración y estadísticas
+// Crear operador
+const createOperator = async (operatorData) => {
+  const response = await api.post('/api/v1/backoffice/operators', operatorData);
+  return response.data;
+};
+```
 
-### 💳 Gestión de Transacciones
-- ✅ Seguimiento completo
-- ✅ Filtros avanzados
-- ✅ Estados de transacción
-- ✅ Detalles financieros
+## 🎨 Temas y Estilos
 
-### 📈 Sistema de Reportes
-- ✅ Generación automática
-- ✅ Múltiples tipos de reporte
-- ✅ Filtros personalizables
-- ✅ Descarga de archivos
+El proyecto usa Material-UI con un tema personalizado:
 
-## 🛠️ Scripts Disponibles
+```javascript
+import { createTheme } from '@mui/material/styles';
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#1976d2',
+    },
+    secondary: {
+      main: '#dc004e',
+    },
+  },
+  // ... más configuraciones
+});
+```
+
+## 🧪 Pruebas
 
 ```bash
-# Desarrollo
-npm run dev          # Inicia servidor de desarrollo
-npm run build        # Construye para producción
-npm run preview      # Previsualiza build de producción
-npm run lint         # Ejecuta ESLint
+# Ejecutar tests
+npm test
 
-# Utilidades
-npm run type-check   # Verifica tipos TypeScript
+# Ejecutar tests con cobertura
+npm test -- --coverage
 ```
 
-## 🔧 Configuración de Desarrollo
+## 📊 Monitoreo
 
-### Variables de Entorno
+- Logs de desarrollo en consola
+- Errores reportados a Sentry
+- Métricas de rendimiento
+
+## 🔒 Seguridad
+
+- Autenticación JWT
+- Protección de rutas
+- Validación de formularios
+- Sanitización de datos
+- HTTPS en producción
+
+## 🚀 Despliegue
 
 ```bash
-# .env
-VITE_API_URL=http://localhost:8000    # URL del backend
-VITE_WS_URL=ws://localhost:8000       # WebSocket URL
-VITE_APP_TITLE=RGS Backoffice        # Título de la app
-VITE_USE_MOCK_API=true               # Usar datos mock
+# Build para producción
+npm run build
+
+# Preview build
+npm run preview
 ```
 
-### Modo Mock API
+## 🤝 Contribuir
 
-El proyecto incluye un sistema completo de datos mock que permite desarrollar sin necesidad de un backend:
+1. Fork el repositorio
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
 
-- ✅ Datos realistas pre-cargados
-- ✅ Simulación de delays de red
-- ✅ Operaciones CRUD funcionales
-- ✅ Manejo de errores
+## 📝 Licencia
 
-## 🎨 Convenciones de Código
+Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE.md](LICENSE.md) para más detalles.
 
-- **TypeScript** para tipado estático
-- **ESLint** para linting
-- **Prettier** para formateo automático
-- **Material UI** para componentes
-- **Conventional Commits** para mensajes
+## 📞 Soporte
 
-## 🤝 Contribución
-
-1. **Fork** el repositorio
-2. **Crea** una rama feature (`git checkout -b feature/nueva-funcionalidad`)
-3. **Commit** tus cambios (`git commit -m 'feat: agregar nueva funcionalidad'`)
-4. **Push** a la rama (`git push origin feature/nueva-funcionalidad`)
-5. **Abre** un Pull Request
-
-## 📄 Licencia
-
-Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para más detalles. 
-
-## 🆘 Soporte
-
-Si encuentras algún problema o tienes preguntas:
-
-1. Revisa la [documentación](#)
-2. Busca en [Issues existentes](#)
-3. Crea un [nuevo Issue](#)
-
----
-
-**Desarrollado con ❤️ para la industria del gaming** 
+Para soporte, email support@your-org.com o crea un issue en el repositorio.
